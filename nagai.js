@@ -1,44 +1,36 @@
 /*
 To do:
-Modularize all inputs and add sliders for some
 Add paper plane or birds?
-Add ability for user to select from a palette or choose custom
-Correct the dimensions for responsiveness and add more global variables that get used by many functions
 Add checks and rules to make buildings not overlap
-Remove irrelevant GUI inputs
-How to add event listener to the GUI
 Add popup at startup explaining how it works / shortcuts / refresh?
-Add video recording functionality
 Add shortcut key presses
+README, github description, site OG properties
+Press h to show/hide menu
+Check firefox and mobile compatibility
+Consider adding more GUI options and sliders for user control
+Add About section and notes / link div
 */
 
 var canvas = document.getElementById("animation");
 canvas.addEventListener("click",refresh);
 var ctx = canvas.getContext("2d");
 
-var canvasWidthInput = document.getElementById("canvasWidthInput");
-canvasWidthInput.addEventListener("change",refresh);
 var canvasWidth;
-
-var canvasHeightInput = document.getElementById("canvasHeightInput");
-canvasHeightInput.addEventListener("change",refresh);
 var canvasHeight;
 
-var animationfps=45;
 var animationInterval;
 var playAnimationToggle = false;
 
-var backgroundColorInput = document.getElementById("backgroundColorInput");
-backgroundColorInput.addEventListener("change",refresh);
 var backgroundColor;
-
-var backgroundColorInput2 = document.getElementById("backgroundColorInput2");
-backgroundColorInput2.addEventListener("change",refresh);
 var backgroundColor2;
+var waterColor;
+var cityColor;
+var lightColor2;
+var lightColor3;
 
-var buildingWidthArray;
-var buildingHeightArray;
-var buildingLeftPositionArray;
+var buildingWidthArray = [];
+var buildingHeightArray = [];
+var buildingLeftPositionArray = [];
 
 var building1PixelData;
 var building2PixelData;
@@ -53,11 +45,6 @@ var sunPositionY = 0.47;
 var sunPositionX = 0.33;
 var waterPosition = 0.55;
 var cityPosition = 0.8;
-
-var waterColor;
-var cityColor;
-var lightColor2;
-var lightColor3;
 
 //detect user browser
 var ua = navigator.userAgent;
@@ -79,16 +66,10 @@ if(ua.includes("Android")){
 }
 console.log("isSafari: "+isSafari+", isFirefox: "+isFirefox+", isIOS: "+isIOS+", isAndroid: "+isAndroid);
 
-//save image button
-var saveImageButton = document.getElementById("saveImageButton");
-saveImageButton.addEventListener('click', saveImage);
-
 //video recording function
-var recordBtn = document.getElementById("recordVideoButton");
 var recording = false;
 var mediaRecorder;
 var recordedChunks;
-recordBtn.addEventListener('click', chooseRecordingFunction);
 var finishedBlob;
 var recordingMessageDiv = document.getElementById("videoRecordingMessageDiv");
 var recordVideoState = false;
@@ -96,57 +77,62 @@ var videoRecordInterval;
 var videoEncoder;
 var muxer;
 var mobileRecorder;
-var videofps = 15;
+var videofps = 30;
+var videoDuration = 20;
+
+//color palettes
+var colorPaletteArray = [
+    ["#0f1e66","#eb3d88","#f3d84b","#244ca4","#15140f","#ffffff","#c2392c"],
+    ["#541136","#E600A3","#FFA710","#5987ff","#3c0e11","#10e2ff","#FFA710"],
+    ["#091833","#711c91","#ea00d9","#133e7c","#000000","#0adbc6","#04b054"],
+    ["#05B6C5","#ff89B4","#FFA710","#244ca4","#F43086","#ffffff","#0FEBE3"]
+]
 
 //MAIN METHOD
-canvasWidthInput.value = Math.floor(window.innerWidth);
-canvasHeightInput.value = Math.floor(window.innerHeight);
 playAnimationToggle = true;
 setTimeout(getUserInputs,200);
-setTimeout(drawBackground,700); //wait for [x]
+setTimeout(drawBackground,700);
 
 //add gui
 var obj = {
-    maxSize: 6.0,
-    speed: 5,
-    height: 10,
-    type: 'three',
-    backgroundColor1: "#0F1E66", //top bg
-    backgroundColor2: "#EB3D88", // bottom bg
-    color3: "#f3d84b", //sun windows lights
-    color4: "#244ca4", // water
-    color5: "#15140f", // black city background
-    color6: "#ffffff", // lights
-    color7: "#C2392C", // lights
+    Palette: 'Shikoku',
+    color0: colorPaletteArray[0][0], //top bg
+    color1: colorPaletteArray[0][1], // bottom bg
+    color2: colorPaletteArray[0][2], //sun windows lights
+    color3: colorPaletteArray[0][3], // water
+    color4: colorPaletteArray[0][4], // black city background
+    color5: colorPaletteArray[0][5], // lights
+    color6: colorPaletteArray[0][6], // lights
 };
+var paletteChoice = obj.Palette;
 
 var gui = new dat.gui.GUI( { autoPlace: false } );
 gui.close();
+var guiOpenToggle = false;
 //gui.remember(obj);
 
 // Choose from accepted values
-gui.add(obj, 'type', [ 'one', 'two', 'three' ] );
+gui.add(obj, 'Palette', [ 'Shikoku', 'Kyushu', 'Hokkaido', 'Okinawa' ] ).listen().onChange(changePalette);
 
-var f1 = gui.addFolder('Colors');
-f1.addColor(obj, 'backgroundColor1');
-f1.addColor(obj, 'backgroundColor2');
-f1.addColor(obj, 'color3');
-f1.addColor(obj, 'color4');
-f1.addColor(obj, 'color5');
-f1.addColor(obj, 'color6');
-f1.addColor(obj, 'color7');
-f1.open();
-
-gui.add(obj, 'maxSize').min(-10).max(10).step(0.25);
-gui.add(obj, 'height').step(5); // Increment amount
-
-// Choose from named values
-gui.add(obj, 'speed', { Stopped: 0, Slow: 0.1, Fast: 5 } );
+var f1 = gui.addFolder('CustomColors');
+f1.addColor(obj, 'color0').listen();
+f1.addColor(obj, 'color1').listen();
+f1.addColor(obj, 'color2').listen();
+f1.addColor(obj, 'color3').listen();
+f1.addColor(obj, 'color4').listen();
+f1.addColor(obj, 'color5').listen();
+f1.addColor(obj, 'color6').listen();
+f1.close();
 
 obj['SaveImage'] = function () {
   saveImage();
 };
 gui.add(obj, 'SaveImage');
+
+obj['SaveVideo'] = function () {
+    chooseRecordingFunction();
+  };
+gui.add(obj, 'SaveVideo');
 
 obj['Refresh'] = function () {
     refresh();
@@ -156,34 +142,29 @@ gui.add(obj, 'Refresh');
 customContainer = document.getElementById( 'gui' );
 customContainer.appendChild(gui.domElement);
 
-
 function getUserInputs(){
-    canvasWidth = Number(canvasWidthInput.value);
-    canvasHeight = Number(canvasHeightInput.value);
-    console.log("Canvas width / height: "+canvasWidth+", "+canvasHeight);
+    canvasWidth = Math.floor(window.innerWidth);
+    canvasHeight = Math.floor(window.innerHeight);
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+    console.log("Canvas width / height: "+canvasWidth+", "+canvasHeight);
 
-    backgroundColor = obj.backgroundColor1;
-    backgroundColor2 = obj.backgroundColor2;
-    sunColor = obj.color3;
-    waterColor = obj.color4;
-    cityColor = obj.color5;
-    lightColor2 = obj.color6;
-    lightColor3 = obj.color7;
+    backgroundColor = obj.color0;
+    backgroundColor2 = obj.color1;
+    sunColor = obj.color2;
+    waterColor = obj.color3;
+    cityColor = obj.color4;
+    lightColor2 = obj.color5;
+    lightColor3 = obj.color6;
 
     buildingWidthArray = [canvasWidth*randomValueBetween(0.1,0.2),canvasWidth*randomValueBetween(0.1,0.2),canvasWidth*randomValueBetween(0.1,0.2)];
-    buildingHeightArray = [canvasHeight*randomValueBetween(0.26,0.33),canvasHeight*randomValueBetween(0.26,0.33),canvasHeight*randomValueBetween(0.26,0.33)];
+    buildingHeightArray = [canvasHeight*randomValueBetween(0.22,0.33),canvasHeight*randomValueBetween(0.22,0.33),canvasHeight*randomValueBetween(0.22,0.33)];
     buildingLeftPositionArray = [canvasWidth*randomValueBetween(0,0.33),canvasWidth*randomValueBetween(0.33,0.67),canvasWidth*randomValueBetween(0.67,0.95)];
 
+    sunPositionX = randomValueBetween(0.30,0.70);
+    sunRadius = Math.min(canvasHeight,canvasWidth)*randomValueBetween(0.2,0.29);
     sunCenterX = canvasWidth*sunPositionX;
     sunCenterY = canvasHeight*sunPositionY;
-    sunRadius = Math.min(canvasHeight,canvasWidth)*0.2;
-}
-
-function randomValueBetween(min,max){
-    var randomValue = min + (max-min)*Math.random();
-    return randomValue;
 }
 
 function refresh(){
@@ -238,7 +219,7 @@ function drawSun(){
 
     //add color stops
     gradient.addColorStop(0,sunColor);
-    gradient.addColorStop(0.55,sunColor);
+    gradient.addColorStop(0.52,sunColor);
     gradient.addColorStop(0.75,"#B40F00");
     ctx.fillStyle = gradient;
 
@@ -266,7 +247,7 @@ function makeBuilding(width,height,leftPosition,windowRows,windowCols,windowPadd
 
     var buildingTopY = canvasHeight - height;
 
-    ctx.fillStyle = cityColor;
+    ctx.fillStyle = "black";
     ctx.fillRect(leftPosition,buildingTopY,width,height);
 
     var windowWidth = (width-(windowPadding*(windowCols+1))) / windowCols;
@@ -307,6 +288,7 @@ var lightColorArray = [];
 function animateLightAndWaves(){
 
     //WAVES
+    var waveRadius = canvasHeight / 500;
     var leftPosition = sunCenterX - sunRadius;
     var rightPosition = sunCenterX + sunRadius;
     var lineLength = Math.floor(rightPosition - leftPosition);
@@ -322,7 +304,6 @@ function animateLightAndWaves(){
     var maxWaveMovement = canvasHeight*0.01;
     var animationSpeed = 70; //larger number gives slower animation
     var loopCounter = 0;
-
 
     //LIGHTS
     var initialYOffset = cityPosition * canvasHeight;
@@ -385,36 +366,30 @@ function animateLightAndWaves(){
         //wave 1
         for(var i=0; i<lineLength; i++){
             
-            var radius = 2;
-
             var sineShift = Math.sin((i/lineLength)*Math.PI*4+loopCounter/animationSpeed) * maxWaveMovement;
             var y = canvasHeight * 0.58+sineShift;
             ctx.beginPath();
-            ctx.arc(leftPosition+i,y,radius,0,Math.PI*2);
+            ctx.arc(leftPosition+i,y,waveRadius,0,Math.PI*2);
             ctx.fill();
         }
 
         //wave 2
         for(var i=0; i<lineLength2; i++){
 
-            var radius = 2;
-
             var sineShift = Math.sin((i/lineLength2)*Math.PI*4+loopCounter/animationSpeed) * maxWaveMovement;
             var y = canvasHeight * 0.61+sineShift;
             ctx.beginPath();
-            ctx.arc(leftPosition2+i,y,radius,0,Math.PI*2);
+            ctx.arc(leftPosition2+i,y,waveRadius,0,Math.PI*2);
             ctx.fill();
         }
 
         //wave 3
         for(var i=0; i<lineLength3; i++){
 
-            var radius = 2;
-
             var sineShift = Math.sin((i/lineLength3)*Math.PI*4+loopCounter/animationSpeed) * maxWaveMovement;
             var y = canvasHeight * 0.64+sineShift;
             ctx.beginPath();
-            ctx.arc(leftPosition3+i,y,radius,0,Math.PI*2);
+            ctx.arc(leftPosition3+i,y,waveRadius,0,Math.PI*2);
             ctx.fill();
         }
 
@@ -478,35 +453,13 @@ function animateLightAndWaves(){
     }
     animationID = window.requestAnimationFrame(loop);
 
-    //improve dot spacing and add randomness / potential skips 
-    //drawWaveLines();
-
 }
 
-function drawWaveLines(){
+//HELPER FUNCTIONS BELOW
 
-    
-    
-    function loop(){
-
-        if(playAnimationToggle == false){
-            playAnimationToggle = true;
-            console.log("clear animation interval");
-            cancelAnimationFrame(); //stop animation
-            return;
-        }
-
-    }
-    window.requestAnimationFrame(loop);
-
-}
-
-function chooseRecordingFunction(){
-
-}
-
-function chooseEndRecordingFunction(){
-
+function randomValueBetween(min,max){
+    var randomValue = min + (max-min)*Math.random();
+    return randomValue;
 }
 
 function saveImage(){
@@ -519,112 +472,270 @@ function saveImage(){
     link.click();
 }
 
+function changePalette(){
+    paletteChoice = obj.Palette;
 
-/* ORIGINAL DRAW BUILDINGS FUNCTION
-
-function drawBuildings(){
-
-    //draw leftmost building
-    var height = canvasHeight*0.28;
-    var buildingTopY = canvasHeight - height;
-    var leftPosition = 0.05 * canvasWidth;
-    var buildingWidth = canvasWidth * 0.15;
-    var rightPosition = leftPosition + buildingWidth;
-
-    ctx.fillStyle = "#15140f";
-    ctx.fillRect(leftPosition,canvasHeight-height,rightPosition-leftPosition,height);
-
-    var windowRows = 10;
-    var windowCols = 5;
-    var numWindows = windowRows * windowCols;
-    var padding = 3;
-    var windowWidth = Math.floor(buildingWidth / windowCols)-padding;
-    var windowHeight = Math.floor(height / windowRows)-padding;
-
-
-    for(var y=0; y<windowRows; y++){
-        for(var x=0; x<windowCols; x++){
-            
-            var rand = Math.random();
-
-            if(rand < 0.67){
-                ctx.fillStyle = "#e4c850"; //yellow
-            } else {
-                ctx.fillStyle = "black";
-            }
-            ctx.fillRect(leftPosition+(padding*(x+1))+x*windowWidth, buildingTopY+(y)*windowHeight+(padding*(y+1)),windowWidth,windowHeight);
-
-        }
+    console.log("change palette");
+    var paletteIndex;
+    
+    if(paletteChoice == "Shikoku"){
+        paletteIndex = 0;
+    } else if(paletteChoice == "Kyushu"){
+        paletteIndex = 1;
+    } else if(paletteChoice == "Hokkaido") {
+        paletteIndex = 2;
+    } else if(paletteChoice == "Okinawa"){
+        paletteIndex = 3;
     }
 
-    //draw middle building
-    var height = canvasHeight*0.26;
-    var buildingTopY = canvasHeight - height;
-    var leftPosition = 0.55 * canvasWidth;
-    var buildingWidth = canvasWidth * 0.12;
-    var rightPosition = leftPosition + buildingWidth;
+    //update GUI values with new palette
+    obj.color0 = colorPaletteArray[paletteIndex][0];
+    obj.color1 = colorPaletteArray[paletteIndex][1];
+    obj.color2 = colorPaletteArray[paletteIndex][2];
+    obj.color3 = colorPaletteArray[paletteIndex][3];
+    obj.color4 = colorPaletteArray[paletteIndex][4];
+    obj.color5 = colorPaletteArray[paletteIndex][5];
+    obj.color6 = colorPaletteArray[paletteIndex][6];
 
-    ctx.fillStyle = "#15140f";
-    ctx.fillRect(leftPosition,canvasHeight-height,rightPosition-leftPosition,height);
-
-    var windowRows = 9;
-    var windowCols = 6;
-    var numWindows = windowRows * windowCols;
-    var padding = 3;
-    var windowWidth = Math.floor(buildingWidth / windowCols)-padding;
-    var windowHeight = Math.floor(height / windowRows)-padding;
-
-
-    for(var y=0; y<windowRows; y++){
-        for(var x=0; x<windowCols; x++){
-            
-            var rand = Math.random();
-
-            if(rand < 0.5){
-                ctx.fillStyle = "#e4c850"; //yellow
-            } else {
-                ctx.fillStyle = "black";
-            }
-            ctx.fillRect(leftPosition+(padding*(x+1))+x*windowWidth, buildingTopY+(y)*windowHeight+(padding*(y+1)),windowWidth,windowHeight);
-
-        }
-    }
-
-    //draw right building
-    var height = canvasHeight*0.3;
-    var buildingTopY = canvasHeight - height;
-    var leftPosition = 0.75 * canvasWidth;
-    var buildingWidth = canvasWidth * 0.16;
-    var rightPosition = leftPosition + buildingWidth;
-
-    ctx.fillStyle = "#15140f";
-    ctx.fillRect(leftPosition,canvasHeight-height,rightPosition-leftPosition,height);
-
-    var windowRows = 12;
-    var windowCols = 4;
-    var numWindows = windowRows * windowCols;
-    var padding = 3;
-    var windowWidth = Math.floor(buildingWidth / windowCols)-padding;
-    var windowHeight = Math.floor(height / windowRows)-padding;
-
-
-    for(var y=0; y<windowRows; y++){
-        for(var x=0; x<windowCols; x++){
-            
-            var rand = Math.random();
-
-            if(rand < 0.85){
-                ctx.fillStyle = "#e4c850"; //yellow
-            } else {
-                ctx.fillStyle = "black";
-            }
-            ctx.fillRect(leftPosition+(padding*(x+1))+x*windowWidth, buildingTopY+(y)*windowHeight+(padding*(y+1)),windowWidth,windowHeight);
-
-        }
-    }
-
-    drawWaveLines();
+    refresh();
 
 }
 
-*/
+function cyclePalette(){
+    if(paletteChoice == "Shikoku"){
+        paletteChoice = "Kyushu";
+        obj.Palette = paletteChoice;
+    } else if(paletteChoice == "Kyushu"){
+        paletteChoice = "Hokkaido";
+        obj.Palette = paletteChoice;
+    } else if(paletteChoice == "Hokkaido"){
+        paletteChoice = "Okinawa";
+        obj.Palette = paletteChoice;
+    }  else if(paletteChoice == "Okinawa"){
+        paletteChoice = "Shikoku";
+        obj.Palette = paletteChoice;
+    }
+    changePalette();
+}
+
+function toggleGUI(){
+    if(guiOpenToggle == false){
+        gui.open();
+        guiOpenToggle = true;
+    } else {
+        gui.close();
+        guiOpenToggle = false;
+    }
+}
+
+//shortcut hotkey presses
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        refresh();
+    } else if (event.key === 'i') {
+        saveImage();
+    } else if (event.key === 'v') {
+        chooseRecordingFunction();
+    } else if (event.key === 'c') {
+        cyclePalette();
+    } else if (event.key === 'o') {
+        toggleGUI();
+    } 
+});
+
+function chooseRecordingFunction(){
+    if(isIOS || isAndroid || isFirefox){
+        startMobileRecording();
+    }else {
+        recordVideoMuxer();
+    }
+}
+
+function chooseEndRecordingFunction(){
+    if(isIOS || isAndroid || isFirefox){
+        mobileRecorder.stop();
+    }else {
+        finalizeVideo();
+    }  
+}
+
+//record html canvas element and export as mp4 video
+//source: https://devtails.xyz/adam/how-to-save-html-canvas-to-mp4-using-web-codecs-api
+async function recordVideoMuxer() {
+    console.log("start muxer video recording");
+    var videoWidth = Math.floor(canvas.width/2)*2;
+    var videoHeight = Math.floor(canvas.height/8)*8; //force a number which is divisible by 8
+    console.log("Video dimensions: "+videoWidth+", "+videoHeight);
+
+    //display user message
+    recordingMessageCountdown(videoDuration);
+    recordingMessageDiv.classList.remove("hidden");
+
+    recordVideoState = true;
+    const ctx = animation.getContext("2d", {
+      // This forces the use of a software (instead of hardware accelerated) 2D canvas
+      // This isn't necessary, but produces quicker results
+      willReadFrequently: true,
+      // Desynchronizes the canvas paint cycle from the event loop
+      // Should be less necessary with OffscreenCanvas, but with a real canvas you will want this
+      desynchronized: true,
+    });
+  
+    muxer = new Mp4Muxer.Muxer({
+      target: new Mp4Muxer.ArrayBufferTarget(),
+    //let muxer = new Muxer({
+        //target: new ArrayBufferTarget(),
+        video: {
+            // If you change this, make sure to change the VideoEncoder codec as well
+            codec: "avc",
+            width: videoWidth,
+            height: videoHeight,
+        },
+  
+      // mp4-muxer docs claim you should always use this with ArrayBufferTarget
+      fastStart: "in-memory",
+    });
+  
+    videoEncoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (e) => console.error(e),
+    });
+  
+    // This codec should work in most browsers
+    // See https://dmnsgn.github.io/media-codecs for list of codecs and see if your browser supports
+    videoEncoder.configure({
+      codec: "avc1.42003e",
+      width: videoWidth,
+      height: videoHeight,
+      bitrate: 10_000_000,
+      bitrateMode: "constant",
+    });
+    //NEW codec: "avc1.42003e",
+    //ORIGINAL codec: "avc1.42001f",
+
+    recordVideoState = true;
+    var frameNumber = 0;
+    setTimeout(finalizeVideo,1000*videoDuration+200); //finish and export video after x seconds
+    
+    //take a snapshot of the canvas every x miliseconds and encode to video
+    videoRecordInterval = setInterval(
+        function(){
+            if(recordVideoState == true){
+                renderCanvasToVideoFrameAndEncode({
+                    animation,
+                    videoEncoder,
+                    frameNumber,
+                    videofps
+                })
+                frameNumber++;
+            }else{
+            }
+        } , 1000/videofps);
+
+}
+
+//finish and export video
+async function finalizeVideo(){
+    console.log("finalize muxer video");
+    recordVideoState = false;
+    clearInterval(videoRecordInterval);
+    // Forces all pending encodes to complete
+    await videoEncoder.flush();
+    muxer.finalize();
+    let buffer = muxer.target.buffer;
+    finishedBlob = new Blob([buffer]); 
+    downloadBlob(new Blob([buffer]));
+
+    //hide user message
+    recordingMessageDiv.classList.add("hidden");
+    
+}
+  
+async function renderCanvasToVideoFrameAndEncode({
+    canvas,
+    videoEncoder,
+    frameNumber,
+    videofps,
+}) {
+    let frame = new VideoFrame(animation, {
+        // Equally spaces frames out depending on frames per second
+        timestamp: (frameNumber * 1e6) / videofps,
+    });
+
+    // The encode() method of the VideoEncoder interface asynchronously encodes a VideoFrame
+    videoEncoder.encode(frame);
+
+    // The close() method of the VideoFrame interface clears all states and releases the reference to the media resource.
+    frame.close();
+}
+
+function downloadBlob() {
+    console.log("download video");
+    let url = window.URL.createObjectURL(finishedBlob);
+    let a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    const date = new Date();
+    const filename = `nagai_${date.toLocaleDateString()}_${date.toLocaleTimeString()}.mp4`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+//record and download videos on mobile devices
+function startMobileRecording(){
+    var stream = animation.captureStream(videofps);
+    mobileRecorder = new MediaRecorder(stream, { 'type': 'video/mp4' });
+    mobileRecorder.addEventListener('dataavailable', finalizeMobileVideo);
+
+    console.log("start simple video recording");
+    console.log("Video dimensions: "+animation.width+", "+animation.height);
+
+    //display user message
+    recordingMessageCountdown(videoDuration);
+    recordingMessageDiv.classList.remove("hidden");
+    
+    recordVideoState = true;
+    refresh(); //start animation
+    mobileRecorder.start(); //start mobile video recording
+
+    setTimeout(function() {
+        mobileRecorder.stop();
+    }, 1000*videoDuration+200);
+    
+}
+
+function finalizeMobileVideo(e) {
+    setTimeout(function(){
+        console.log("finish simple video recording");
+        recordVideoState = false;
+        /*
+        mobileRecorder.stop();*/
+        var videoData = [ e.data ];
+        finishedBlob = new Blob(videoData, { 'type': 'video/mp4' });
+        downloadBlob(finishedBlob);
+        
+        //hide user message
+        recordingMessageDiv.classList.add("hidden");
+
+    },500);
+
+}
+
+function recordingMessageCountdown(duration){
+
+    var secondsLeft = Math.ceil(duration);
+
+    var countdownInterval = setInterval(function(){
+        secondsLeft--;
+        recordingMessageDiv.innerHTML = 
+        "Video recording underway. The video will be saved to your downloads folder in <span id=\"secondsLeft\">"+secondsLeft+"</span> seconds.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.";  
+        
+        if(secondsLeft <= 0){
+            console.log("clear countdown interval");
+            clearInterval(countdownInterval);
+        }
+    },1000);
+    
+}

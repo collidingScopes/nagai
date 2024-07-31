@@ -12,12 +12,11 @@ html, body{
     left: 0;
     position: fixed;
     top: 0;
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 .closed{
-    height: 0;
-    width: 0;
+    height: 15px;
 }
 
 #introDiv{
