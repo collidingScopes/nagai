@@ -3,12 +3,8 @@ To do:
 Add paper plane or birds?
 Add checks and rules to make buildings not overlap
 Add popup at startup explaining how it works / shortcuts / refresh?
-Add shortcut key presses
-README, github description, site OG properties
-Press h to show/hide menu
 Check firefox and mobile compatibility
 Consider adding more GUI options and sliders for user control
-Add About section and notes / link div
 */
 
 var canvas = document.getElementById("animation");

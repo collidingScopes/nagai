@@ -6,21 +6,24 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <script type="text/javascript" src="dat.gui-master/build/dat.gui.min.js"></script>
 
-        <!--
+        <!-- Google fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+        
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        <meta property="og:title" content="Faulty Typewriter - text animator" />
-        <meta property="og:description" content="Create text animations and poster art" />
+        <meta property="og:title" content="Hiroshi Nagai - animated painting" />
+        <meta property="og:description" content="Create your own animated painting" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://collidingscopes.github.io/faultyTypewriter/" />
-        <meta property="og:image" content="https://collidingscopes.github.io/faultyTypewriter/images/siteOGImage2.png">
+        <meta property="og:url" content="https://collidingscopes.github.io/nagai/" />
+        <meta property="og:image" content="https://collidingscopes.github.io/nagai/images/Okinawa.png">
         <meta property="og:image:type" content="image/png" >
-        <meta property="og:image:width" content="1833" >
-        <meta property="og:image:height" content="1833" >
+        <meta property="og:image:width" content="866" >
+        <meta property="og:image:height" content="825" >
 
         <link rel="icon" href="images/siteFavicon3.png">
         <link rel="apple-touch-icon" href="images/siteFavicon3.png">
-        -->
         
     </head>
     <body>
@@ -32,6 +35,39 @@
             <div id="videoRecordingMessageDiv" class="hidden sticky-bottom">
             </div>
 
+        </div>
+
+        <div id="notesDiv">
+            <div id="textBox">
+                <h2 id="aboutText">Hiroshi Nagai Animated Painting</h2>
+                <p>Generate a one-of-a-kind animated painting in the style of Hiroshi Nagai.</p>
+                <p>The canvas size is based on your device's dimensions. The position / size / color of the painting is randomly generated within certain guidelines.</p>
+                <p>You can choose from various color palettes.</p>
+                <p>There are a few hotkeys which can be used:</p>
+                <ul>
+                    <li><b>i</b> to export an image</li>
+                    <li><b>v</b> to export a video</li>
+                    <li><b>enter</b> (or click anywhere on the canvas) to refresh with new random values</li>
+                    <li><b>c</b> to change the color palette</li>
+                    <li><b>o</b> to open/close the menu options</li>
+                </ul>
+                <p>This tool is completely free, open source, without any paywalls or premium options. You are welcome to use it for personal or commercial purposes.</p>
+                <p>If you had fun and are feeling generous, feel free to buy me a coffee. This would be much appreciated during late-night coding sessions!</p>
+                <a href="https://www.buymeacoffee.com/stereoDrift" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png" alt="Buy Me A Coffee"></a>
+                <p>This project is coded using Javascript, HTML, and CSS (see github repo linked below). Video creation and encoding is done using mp4 muxer.</p>
+                <p>Feel free to reach out to discuss, ask questions, or to share your creations! The animations can be easily uploaded to instagram or otherwise -- you can tag me <a href="https://www.instagram.com/stereo.drift/" target="_blank" rel="noopener">@stereo.drift</a></p>
+            </div>
+        </div>
+
+        <div id="linksDiv">
+            <table id="infoMenuTable">
+                <tr>
+                    <td><button id="gitHubButton"class="socialMediaButton"><a href="https://github.com/collidingScopes/nagai" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i></a></button></td>
+                    <td><button id="coffeeButton" class="socialMediaButton"><a href="https://www.buymeacoffee.com/stereoDrift" target="_blank" rel="noopener"><i class="fa-solid fa-heart"></i></a></button></td>
+                    <td><button id="instagramButton" class="socialMediaButton"><a href="https://www.instagram.com/stereo.drift/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></button></td>
+                    <td><button id="emailButton" class="socialMediaButton"><a href="mailto:stereodriftvisuals@gmail.com" target="_blank" rel="noopener"><i class="fa-solid fa-envelope"></i></a></button></td>
+                </tr>
+            </table>
         </div>
 
     <script src="nagai.js"></script>
