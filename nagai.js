@@ -5,6 +5,8 @@ Add checks and rules to make buildings not overlap
 Add popup at startup explaining how it works / shortcuts / refresh?
 Check firefox and mobile compatibility
 Consider adding more GUI options and sliders for user control
+Press h to show hide the entire menu bar
+Lock on screen when refresh function called
 */
 
 var canvas = document.getElementById("animation");
@@ -40,7 +42,7 @@ var sunColor;
 var sunPositionY = 0.47;
 var sunPositionX = 0.33;
 var waterPosition = 0.55;
-var cityPosition = 0.8;
+var cityPosition = 0.85;
 
 //detect user browser
 var ua = navigator.userAgent;
@@ -81,7 +83,7 @@ var colorPaletteArray = [
     ["#0f1e66","#eb3d88","#f3d84b","#244ca4","#15140f","#ffffff","#c2392c"],
     ["#541136","#E600A3","#FFA710","#5987ff","#3c0e11","#10e2ff","#FFA710"],
     ["#091833","#711c91","#ea00d9","#133e7c","#000000","#0adbc6","#04b054"],
-    ["#05B6C5","#ff89B4","#FFA710","#244ca4","#F43086","#ffffff","#0FEBE3"]
+    ["#0a969f","#ac71e7","#FFA710","#244ca4","#F43086","#ffffff","#0FEBE3"]
 ]
 
 //MAIN METHOD
@@ -225,16 +227,44 @@ function drawSun(){
     drawWater();
 }
 
+var waterPixelData;
 function drawWater(){
     ctx.fillStyle = waterColor;
-    ctx.fillRect(0,canvasHeight*waterPosition,canvasWidth,canvasHeight*(1-waterPosition));
+    //ctx.fillRect(0,canvasHeight*waterPosition,canvasWidth,canvasHeight*(cityPosition-waterPosition));
+    for(var y=canvasHeight*waterPosition; y<canvasHeight*cityPosition; y++){
+        for(var x=0; x<canvasWidth; x++){
+            var rand = Math.random();
+            if(rand<0.9){
+                ctx.fillStyle = waterColor;
+            } else {
+                ctx.fillStyle = "navy";
+            }
+
+            ctx.fillRect(x,y,1,1);
+        }
+    }
+
+    waterPixelData = ctx.getImageData(0, canvasHeight*waterPosition, canvasWidth, canvasHeight*0.11);
 
     drawCity();
 }
 
 function drawCity(){
-    ctx.fillStyle = cityColor;
-    ctx.fillRect(0,canvasHeight*cityPosition,canvasWidth,canvasHeight*(1-cityPosition));
+    //ctx.fillStyle = cityColor;
+    //ctx.fillRect(0,canvasHeight*cityPosition,canvasWidth,canvasHeight*(1-cityPosition));
+    for(var y=canvasHeight*cityPosition; y<canvasHeight; y++){
+        for(var x=0; x<canvasWidth; x++){
+            var rand = Math.random();
+            if(rand<0.95){
+                ctx.fillStyle = cityColor;
+            } else {
+                ctx.fillStyle = "#dadada";
+            }
+
+            ctx.fillRect(x,y,1,1);
+        }
+    }
+
 
     drawBuildings();
 }
@@ -285,16 +315,16 @@ function animateLightAndWaves(){
 
     //WAVES
     var waveRadius = canvasHeight / 500;
-    var leftPosition = sunCenterX - sunRadius;
-    var rightPosition = sunCenterX + sunRadius;
+    var leftPosition = sunCenterX - sunRadius*0.85;
+    var rightPosition = sunCenterX + sunRadius*0.85;
     var lineLength = Math.floor(rightPosition - leftPosition);
 
-    var leftPosition2 = sunCenterX - sunRadius*0.8;
-    var rightPosition2 = sunCenterX + sunRadius*0.8;
+    var leftPosition2 = sunCenterX - sunRadius*0.75;
+    var rightPosition2 = sunCenterX + sunRadius*0.75;
     var lineLength2 = Math.floor(rightPosition2 - leftPosition2);
 
-    var leftPosition3 = sunCenterX - sunRadius*0.6;
-    var rightPosition3 = sunCenterX + sunRadius*0.6;
+    var leftPosition3 = sunCenterX - sunRadius*0.65;
+    var rightPosition3 = sunCenterX + sunRadius*0.65;
     var lineLength3 = Math.floor(rightPosition3 - leftPosition3);
 
     var maxWaveMovement = canvasHeight*0.01;
@@ -307,7 +337,7 @@ function animateLightAndWaves(){
 
     //draw diagonal lights
     var diagonalLines = 10;
-    var numLightsPerLine = 25;
+    var numLightsPerLine = 35;
     var bottomY = canvasHeight;
     var topY = initialYOffset;
     var yDistance = bottomY - topY;
@@ -336,7 +366,7 @@ function animateLightAndWaves(){
 
     //draw horizontal lights
     var lightRows = 8;
-    var numLightsPerRow = Math.floor(canvasWidth/16);
+    var numLightsPerRow = Math.floor(canvasWidth/14);
     var dotRadius = Math.min(canvasHeight,canvasWidth)/120;
     var currentColor;
 
@@ -354,8 +384,9 @@ function animateLightAndWaves(){
         }
 
         //re-draw water;
-        ctx.fillStyle = waterColor;
-        ctx.fillRect(0,canvasHeight*waterPosition,canvasWidth,canvasHeight*0.13);
+        //ctx.fillStyle = waterColor;
+        //ctx.fillRect(0,canvasHeight*waterPosition,canvasWidth,canvasHeight*0.11);
+        ctx.putImageData(waterPixelData,0,canvasHeight*waterPosition);
 
         ctx.fillStyle = sunColor;
 
