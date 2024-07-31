@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" src="dat.gui-master/build/dat.gui.min.js"></script>
+
+        <!--
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <meta property="og:title" content="Faulty Typewriter - text animator" />
+        <meta property="og:description" content="Create text animations and poster art" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://collidingscopes.github.io/faultyTypewriter/" />
+        <meta property="og:image" content="https://collidingscopes.github.io/faultyTypewriter/images/siteOGImage2.png">
+        <meta property="og:image:type" content="image/png" >
+        <meta property="og:image:width" content="1833" >
+        <meta property="og:image:height" content="1833" >
+
+        <link rel="icon" href="images/siteFavicon3.png">
+        <link rel="apple-touch-icon" href="images/siteFavicon3.png">
+        -->
+        
+    </head>
+    <body>
+
+        <div id="introDiv" class="hidden">
+        </div>
+        
+        <div id="toolDiv">
+            <div id="gui"></div>
+            <canvas id="animation"></canvas>
+
+            <table id="inputTable">
+                <tr>
+                    <td id="backgroundColorInputCell">
+                        <pre><span class="tableText">Backgr. Color</span><br><input type="color" id="backgroundColorInput" value="#0F1E66"/></pre>
+                    </td>
+                    <td id="backgroundColorInputCell2">
+                        <pre><span class="tableText">Backgr. Color 2</span><br><input type="color" id="backgroundColorInput2" value="#EB3D88"/></pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <pre><span class="tableText">Speed</span><br><input class="input-number-noSpinners" type="range" id="speedInput" value="18" min="1" max="50"></pre>
+                    </td>
+                    <td>
+                        <pre><span class="tableText">Waviness</span><br><input class="input-number-noSpinners" type="range" id="wavyInput" value="25" min="0" max="100"></pre>
+                    </td>
+                    <td>
+                        <pre><span class="tableText">Color Range</span><br><input class="input-number-noSpinners" type="range" id="colorRangeInput" value="40" min="0" max="100"></pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <pre><span class="tableText">Canvas Width</span><br><input class="input-number-noSpinners" type="number" id="canvasWidthInput" value="1000" min="1" max="3000"></pre>
+                    </td>
+                    <td>
+                        <pre><span class="tableText">Canvas Height</span><br><input class="input-number-noSpinners" type="number" id="canvasHeightInput" value="1200" min="1" max="3000"></pre>
+                    </td>
+                </tr>
+
+            </table>
+
+            <button id="saveImageButton">Export Image</button>
+            <button id="recordVideoButton">Export Video</button>
+
+            <div id="videoRecordingMessageDiv" class="hidden sticky-bottom">
+                Video recording underway. The video will be saved to your downloads folder once the text animation finishes.<br><br>This feature can be a bit buggy on Mobile -- if it doesn't work, please try on Desktop instead.
+            </div>
+
+
+        </div>
+
+    <script src="nagai.js"></script>
+    <script src="mp4-muxer-main/build/mp4-muxer.js"></script>
+
+</html>
