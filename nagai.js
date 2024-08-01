@@ -741,7 +741,6 @@ function startMobileRecording(){
     recordingMessageDiv.classList.remove("hidden");
     
     recordVideoState = true;
-    refresh(); //start animation
     mobileRecorder.start(); //start mobile video recording
 
     setTimeout(function() {
