@@ -14,4 +14,3 @@ There are a few hotkeys which can be used:
 * o to open/close the menu options
 
 <img src="/images/Shikoku.png">
-<img src="/images/Hokkaido.png">
