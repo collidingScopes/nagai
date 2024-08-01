@@ -18,6 +18,7 @@ var canvasHeight;
 
 var animationInterval;
 var playAnimationToggle = false;
+ctx.globalAlpha = 1;
 
 var backgroundColor;
 var backgroundColor2;
@@ -80,7 +81,7 @@ var videoDuration = 20;
 
 //color palettes
 var colorPaletteArray = [
-    ["#0f1e66","#eb3d88","#f3d84b","#244ca4","#15140f","#ffffff","#c2392c"],
+    ["#0f1e66","#eb3d88","#f3d84b","#244CA4","#15140f","#ffffff","#c2392c"],
     ["#541136","#E600A3","#FFA710","#5987ff","#3c0e11","#10e2ff","#FFA710"],
     ["#091833","#711c91","#ea00d9","#133e7c","#000000","#0adbc6","#04b054"],
     ["#0a969f","#b1ecff","#FFA710","#244ca4","#F43086","#ffffff","#0FEBE3"]
@@ -208,8 +209,24 @@ function drawBackground(){
 }
 
 function drawSun(){
+
+    //draw background suns -- bigger and low opacity
+    var numBackgroundSuns = 5;
+    for(var i=0; i<numBackgroundSuns; i++){
+        var currentOpacity = 0.08 + 0.08*i;
+        ctx.globalAlpha = currentOpacity;
+        var currentRadius = sunRadius + sunRadius*((numBackgroundSuns-i)/numBackgroundSuns);
+        ctx.fillStyle = sunColor;
+        ctx.beginPath();
+        ctx.arc(sunCenterX,sunCenterY,currentRadius,0,Math.PI*2);
+        ctx.fill();
+        ctx.closePath();
+    }
+    
+    ctx.globalAlpha = 1;
     ctx.beginPath();
-    ctx.fillStyle = sunColor;
+
+    //draw actual sun
     ctx.arc(sunCenterX,sunCenterY,sunRadius,0,Math.PI*2);
 
     //create gradient
@@ -222,6 +239,8 @@ function drawSun(){
     ctx.fillStyle = gradient;
 
     ctx.fill();
+    ctx.closePath();
+
     //should add some color gradient at the bottom for streaks of orange / red
 
     drawWater();
@@ -229,9 +248,9 @@ function drawSun(){
 
 var waterPixelData;
 function drawWater(){
-    ctx.fillStyle = waterColor;
+    //ctx.fillStyle = waterColor;
     //ctx.fillRect(0,canvasHeight*waterPosition,canvasWidth,canvasHeight*(cityPosition-waterPosition));
-    for(var y=canvasHeight*waterPosition; y<canvasHeight*cityPosition; y++){
+    for(var y=Math.ceil(canvasHeight*waterPosition); y<Math.ceil(canvasHeight*cityPosition); y++){
         for(var x=0; x<canvasWidth; x++){
             var rand = Math.random();
             if(rand<0.9){
@@ -239,20 +258,20 @@ function drawWater(){
             } else {
                 ctx.fillStyle = "navy";
             }
-
+            ctx.globalAlpha = 0.7;
             ctx.fillRect(x,y,1,1);
         }
     }
 
     waterPixelData = ctx.getImageData(0, canvasHeight*waterPosition, canvasWidth, canvasHeight*0.11);
-
+    ctx.globalAlpha = 1;
     drawCity();
 }
 
 function drawCity(){
     //ctx.fillStyle = cityColor;
     //ctx.fillRect(0,canvasHeight*cityPosition,canvasWidth,canvasHeight*(1-cityPosition));
-    for(var y=canvasHeight*cityPosition; y<canvasHeight; y++){
+    for(var y=Math.ceil(canvasHeight*cityPosition); y<canvasHeight; y++){
         for(var x=0; x<canvasWidth; x++){
             var rand = Math.random();
             if(rand<0.95){
@@ -264,7 +283,6 @@ function drawCity(){
             ctx.fillRect(x,y,1,1);
         }
     }
-
 
     drawBuildings();
 }
@@ -315,16 +333,16 @@ function animateLightAndWaves(){
 
     //WAVES
     var waveRadius = canvasHeight / 500;
-    var leftPosition = sunCenterX - sunRadius*0.85;
-    var rightPosition = sunCenterX + sunRadius*0.85;
+    var leftPosition = sunCenterX - sunRadius*0.8;
+    var rightPosition = sunCenterX + sunRadius*0.8;
     var lineLength = Math.floor(rightPosition - leftPosition);
 
-    var leftPosition2 = sunCenterX - sunRadius*0.75;
-    var rightPosition2 = sunCenterX + sunRadius*0.75;
+    var leftPosition2 = sunCenterX - sunRadius*0.65;
+    var rightPosition2 = sunCenterX + sunRadius*0.65;
     var lineLength2 = Math.floor(rightPosition2 - leftPosition2);
 
-    var leftPosition3 = sunCenterX - sunRadius*0.65;
-    var rightPosition3 = sunCenterX + sunRadius*0.65;
+    var leftPosition3 = sunCenterX - sunRadius*0.5;
+    var rightPosition3 = sunCenterX + sunRadius*0.5;
     var lineLength3 = Math.floor(rightPosition3 - leftPosition3);
 
     var maxWaveMovement = canvasHeight*0.01;
@@ -342,8 +360,7 @@ function animateLightAndWaves(){
     var topY = initialYOffset;
     var yDistance = bottomY - topY;
     var sunDistanceY = bottomY - sunCenterY;
-    var dotRadius = Math.min(canvasHeight,canvasWidth)/250;
-
+    var dotRadius = Math.min(canvasHeight,canvasWidth)/300;
 
     for(i=0; i<diagonalLines; i++){
         var startingX = (i+1)/(diagonalLines+1) * canvasWidth;

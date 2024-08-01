@@ -12,7 +12,6 @@ html, body{
     left: 0;
     position: fixed;
     top: 0;
-    opacity: 0.85;
 }
 
 .closed{
@@ -67,7 +66,6 @@ html, body{
     text-align: center;
     justify-content: center;
     background-color: #2D0A3D;
-
 }
 
 #notesDiv{
