@@ -160,8 +160,8 @@ function getUserInputs(){
     buildingHeightArray = [canvasHeight*randomValueBetween(0.22,0.33),canvasHeight*randomValueBetween(0.22,0.33),canvasHeight*randomValueBetween(0.22,0.33)];
     buildingLeftPositionArray = [canvasWidth*randomValueBetween(0,0.33),canvasWidth*randomValueBetween(0.33,0.67),canvasWidth*randomValueBetween(0.67,0.95)];
 
-    sunPositionX = randomValueBetween(0.30,0.70);
-    sunRadius = Math.min(canvasHeight,canvasWidth)*randomValueBetween(0.2,0.29);
+    sunPositionX = randomValueBetween(0.33,0.67);
+    sunRadius = Math.min(canvasHeight,canvasWidth)*randomValueBetween(0.23,0.32);
     sunCenterX = canvasWidth*sunPositionX;
     sunCenterY = canvasHeight*sunPositionY;
 }
@@ -213,7 +213,7 @@ function drawSun(){
     //draw background suns -- bigger and low opacity
     var numBackgroundSuns = 5;
     for(var i=0; i<numBackgroundSuns; i++){
-        var currentOpacity = 0.08 + 0.08*i;
+        var currentOpacity = 0.05 + 0.05*i;
         ctx.globalAlpha = currentOpacity;
         var currentRadius = sunRadius + sunRadius*((numBackgroundSuns-i)/numBackgroundSuns);
         ctx.fillStyle = sunColor;
